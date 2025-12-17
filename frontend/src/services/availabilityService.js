@@ -6,6 +6,11 @@ export const availabilityService = {
     return response.data;
   },
 
+  getDoctorAvailability: async (doctorId) => {
+    const response = await api.get(`/availability/doctor/${doctorId}`);
+    return response.data;
+  },
+
   addAvailability: async (availabilityData) => {
     const response = await api.post('/availability', availabilityData);
     return response.data;

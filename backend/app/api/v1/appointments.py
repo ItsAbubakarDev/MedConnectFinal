@@ -1,13 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
-from datetime import datetime
+from datetime import datetime, time as dt_time
 
 from app.database import get_db
 from app.models.user import User
 from app.models.patient import Patient
 from app.models.doctor import Doctor
 from app.models.appointment import Appointment
+from app.models.availability import Availability
 from app.schemas.appointment import AppointmentCreate, AppointmentUpdate, AppointmentResponse
 from app.api.deps import get_current_user
 
@@ -38,6 +39,38 @@ def book_appointment(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Doctor not found"
+        )
+    
+    # Validate appointment is within doctor's availability
+    day_of_week = appointment_data.date.strftime('%A').lower()
+    appointment_time = appointment_data.time
+    
+    available_slot = db.query(Availability).filter(
+        Availability.doctor_id == doctor.id,
+        Availability.day_of_week == day_of_week,
+        Availability.is_available == True,
+        Availability.start_time <= appointment_time,
+        Availability.end_time > appointment_time
+    ).first()
+    
+    if not available_slot:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Doctor is not available on {day_of_week} at {appointment_time}. Please choose a time within their available hours."
+        )
+    
+    # Check for conflicting appointments
+    existing_appointment = db.query(Appointment).filter(
+        Appointment.doctor_id == doctor.id,
+        Appointment.date == appointment_data.date,
+        Appointment.time == appointment_data.time,
+        Appointment.status.in_(["pending", "confirmed"])
+    ).first()
+    
+    if existing_appointment:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This time slot is already booked. Please choose another time."
         )
     
     new_appointment = Appointment(

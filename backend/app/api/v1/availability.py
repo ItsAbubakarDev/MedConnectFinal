@@ -55,6 +55,28 @@ def get_my_availability(
     return availability_slots
 
 
+@router.get("/doctor/{doctor_id}", response_model=List[AvailabilityResponse])
+def get_doctor_availability(
+    doctor_id: str,
+    db: Session = Depends(get_db)
+):
+    from uuid import UUID
+    try:
+        doctor_uuid = UUID(doctor_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid doctor ID format"
+        )
+    
+    availability_slots = db.query(Availability).filter(
+        Availability.doctor_id == doctor_uuid,
+        Availability.is_available == True
+    ).order_by(Availability.day_of_week).all()
+    
+    return availability_slots
+
+
 @router.post("", response_model=AvailabilityResponse, status_code=status.HTTP_201_CREATED)
 def add_availability(
     availability_data: AvailabilityCreate,

@@ -11,7 +11,7 @@ class AppointmentBase(BaseModel):
 
 
 class AppointmentCreate(AppointmentBase):
-    doctor_id: int
+    doctor_id: uuid.UUID
 
 
 class AppointmentUpdate(BaseModel):
