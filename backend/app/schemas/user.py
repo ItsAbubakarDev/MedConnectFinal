@@ -38,6 +38,7 @@ class Token(BaseModel):
     email: str
     role: str
     name: str
+    profile_picture: Optional[str] = None
 
 
 class TokenData(BaseModel):

@@ -55,8 +55,21 @@ function DoctorDashboard() {
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
-        <h1>Welcome, Dr. {user?.name || 'Doctor'}</h1>
-        <p>Manage your appointments and availability</p>
+        <div className="dashboard-header-content">
+          <div className="dashboard-profile">
+            {user?.profilePicture ? (
+              <img src={user.profilePicture} alt="Profile" className="dashboard-profile-img" />
+            ) : (
+              <div className="dashboard-profile-placeholder">
+                <span>{(user?.name || 'D').charAt(0).toUpperCase()}</span>
+              </div>
+            )}
+          </div>
+          <div className="dashboard-header-text">
+            <h1>Welcome, Dr. {user?.name || 'Doctor'}</h1>
+            <p>Manage your appointments and availability</p>
+          </div>
+        </div>
       </div>
 
       <div className="dashboard-grid">

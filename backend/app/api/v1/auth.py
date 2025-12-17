@@ -119,10 +119,122 @@ def login(
         user_id=user.id,
         email=user.email,
         role=user.role,
-        name=user.full_name
+        name=user.full_name,
+        profile_picture=user.profile_picture
     )
 
 
 @router.get("/me", response_model=UserResponse)
 def get_current_user_info(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+@router.get("/profile")
+def get_profile(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Get current user's profile with extended information"""
+    profile_data = {
+        "id": current_user.id,
+        "email": current_user.email,
+        "first_name": current_user.first_name,
+        "last_name": current_user.last_name,
+        "role": current_user.role,
+        "is_active": current_user.is_active,
+        "profile_picture": current_user.profile_picture if hasattr(current_user, 'profile_picture') else None,
+    }
+    
+    if current_user.role == "patient":
+        patient = db.query(Patient).filter(Patient.user_id == current_user.id).first()
+        if patient:
+            profile_data.update({
+                "phone": patient.phone,
+                "address": patient.address,
+                "bio": patient.emergency_contact,  # Using emergency_contact as bio for now
+            })
+    elif current_user.role == "doctor":
+        doctor = db.query(Doctor).filter(Doctor.user_id == current_user.id).first()
+        if doctor:
+            profile_data.update({
+                "phone": doctor.phone,
+                "bio": doctor.bio,
+            })
+    
+    return profile_data
+
+
+@router.put("/profile")
+def update_profile(
+    profile_data: dict,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Update current user's profile"""
+    # Update user table
+    if "first_name" in profile_data:
+        current_user.first_name = profile_data["first_name"]
+    if "last_name" in profile_data:
+        current_user.last_name = profile_data["last_name"]
+    
+    # Handle profile picture (stored as base64 string for simplicity)
+    # In production, you would upload to cloud storage like S3 or Cloudinary
+    if "profile_picture" in profile_data:
+        if hasattr(current_user, 'profile_picture'):
+            current_user.profile_picture = profile_data["profile_picture"]
+    
+    # Update role-specific data
+    if current_user.role == "patient":
+        patient = db.query(Patient).filter(Patient.user_id == current_user.id).first()
+        if patient:
+            if "phone" in profile_data:
+                patient.phone = profile_data["phone"]
+            if "address" in profile_data:
+                patient.address = profile_data["address"]
+            if "bio" in profile_data:
+                patient.emergency_contact = profile_data["bio"]
+    elif current_user.role == "doctor":
+        doctor = db.query(Doctor).filter(Doctor.user_id == current_user.id).first()
+        if doctor:
+            if "phone" in profile_data:
+                doctor.phone = profile_data["phone"]
+            if "bio" in profile_data:
+                doctor.bio = profile_data["bio"]
+    
+    db.commit()
+    db.refresh(current_user)
+    return {"message": "Profile updated successfully", "profile_picture": current_user.profile_picture if hasattr(current_user, 'profile_picture') else None}
+
+
+@router.post("/change-password")
+def change_password(
+    password_data: dict,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Change user's password"""
+    current_password = password_data.get("current_password")
+    new_password = password_data.get("new_password")
+    
+    if not current_password or not new_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password and new password are required"
+        )
+    
+    # Verify current password
+    if not verify_password(current_password, current_user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect"
+        )
+    
+    # Validate new password
+    if len(new_password) < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must be at least 6 characters long"
+        )
+    
+    # Update password
+    current_user.hashed_password = hash_password(new_password)
+    db.commit()
+    
+    return {"message": "Password changed successfully"}

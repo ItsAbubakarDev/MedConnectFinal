@@ -1,22 +1,22 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import Button from './Button';
 import './Navbar.css';
 
 function Navbar() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const goToProfile = () => {
+    navigate('/profile');
   };
 
   return (
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-brand">
-          <span className="brand-icon">+</span> HealthCare
+          <span className="brand-icon">+</span> MedConnect
         </Link>
 
         <div className="navbar-menu">
@@ -48,12 +48,19 @@ function Navbar() {
                   </Link>
                 </>
               )}
-              <span className="nav-user">
-                {user.name || user.email}
-              </span>
-              <Button variant="outline" onClick={handleLogout}>
-                Logout
-              </Button>
+              <button 
+                className="user-menu-trigger"
+                onClick={goToProfile}
+              >
+                {user.profilePicture ? (
+                  <img src={user.profilePicture} alt="Profile" className="user-avatar-img" />
+                ) : (
+                  <span className="user-avatar">
+                    {(user.name || user.email).charAt(0).toUpperCase()}
+                  </span>
+                )}
+                <span className="user-name">{user.name || user.email}</span>
+              </button>
             </>
           ) : (
             <>
@@ -67,6 +74,7 @@ function Navbar() {
           )}
         </div>
       </div>
+
     </nav>
   );
 }

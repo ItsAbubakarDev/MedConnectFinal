@@ -12,6 +12,7 @@ import BookAppointment from './pages/patient/BookAppointment';
 import MedicalRecords from './pages/patient/MedicalRecords';
 import DoctorDashboard from './pages/doctor/DoctorDashboard';
 import ManageAvailability from './pages/doctor/ManageAvailability';
+import Profile from './pages/Profile';
 import './App.css';
 
 function App() {
@@ -88,6 +89,15 @@ function App() {
                 element={
                   <PrivateRoute allowedRoles={['doctor']}>
                     <ManageAvailability />
+                  </PrivateRoute>
+                }
+              />
+
+              <Route
+                path="/profile"
+                element={
+                  <PrivateRoute allowedRoles={['patient', 'doctor']}>
+                    <Profile />
                   </PrivateRoute>
                 }
               />

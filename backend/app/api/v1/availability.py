@@ -1,13 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
+from uuid import UUID
 
 from app.database import get_db
 from app.models.user import User
 from app.models.doctor import Doctor
 from app.models.availability import Availability
 from app.api.deps import get_current_doctor
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 from datetime import time
 
 router = APIRouter()
@@ -21,11 +22,15 @@ class AvailabilityCreate(BaseModel):
 
 class AvailabilityResponse(BaseModel):
     id: int
-    doctor_id: str
+    doctor_id: UUID
     day_of_week: str
     start_time: time
     end_time: time
     is_available: bool
+
+    @field_serializer('doctor_id')
+    def serialize_doctor_id(self, doctor_id: UUID, _info):
+        return str(doctor_id)
 
     class Config:
         from_attributes = True

@@ -40,6 +40,7 @@ export const AuthProvider = ({ children }) => {
         email: data.email,
         role: data.role,
         name: data.name,
+        profilePicture: data.profile_picture,
       };
       
       localStorage.setItem('user', JSON.stringify(userData));
@@ -71,12 +72,19 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const updateUser = (updatedUserData) => {
+    const newUserData = { ...user, ...updatedUserData };
+    setUser(newUserData);
+    localStorage.setItem('user', JSON.stringify(newUserData));
+  };
+
   const value = {
     user,
     loading,
     login,
     register,
     logout,
+    updateUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
