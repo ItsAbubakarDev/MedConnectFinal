@@ -120,7 +120,7 @@ function Home() {
             <div className="testimonial-author">
               <div className="author-avatar">SM</div>
               <div className="author-info">
-                <div className="author-name">Sarah Mitchell</div>
+                <div className="author-name">Sarah Mehmood</div>
                 <div className="author-role">Patient</div>
               </div>
             </div>
@@ -135,7 +135,7 @@ function Home() {
             <div className="testimonial-author">
               <div className="author-avatar">JC</div>
               <div className="author-info">
-                <div className="author-name">Dr. James Chen</div>
+                <div className="author-name">Dr. Jamil Chaudhary</div>
                 <div className="author-role">Cardiologist</div>
               </div>
             </div>
@@ -148,9 +148,9 @@ function Home() {
               I feel more connected to my healthcare than ever before."
             </p>
             <div className="testimonial-author">
-              <div className="author-avatar">MP</div>
+              <div className="author-avatar">MZ</div>
               <div className="author-info">
-                <div className="author-name">Michael Peterson</div>
+                <div className="author-name">Maria Zahra</div>
                 <div className="author-role">Patient</div>
               </div>
             </div>
@@ -165,7 +165,7 @@ function Home() {
             <div className="testimonial-author">
               <div className="author-avatar">EA</div>
               <div className="author-info">
-                <div className="author-name">Dr. Emily Anderson</div>
+                <div className="author-name">Dr. Eman Ali</div>
                 <div className="author-role">Pediatrician</div>
               </div>
             </div>
@@ -180,7 +180,7 @@ function Home() {
             <div className="testimonial-author">
               <div className="author-avatar">LR</div>
               <div className="author-info">
-                <div className="author-name">Lisa Rodriguez</div>
+                <div className="author-name">Laiba Riaz</div>
                 <div className="author-role">Patient</div>
               </div>
             </div>
@@ -195,7 +195,7 @@ function Home() {
             <div className="testimonial-author">
               <div className="author-avatar">RK</div>
               <div className="author-info">
-                <div className="author-name">Dr. Robert Kim</div>
+                <div className="author-name">Dr. Rida Kashif</div>
                 <div className="author-role">Neurologist</div>
               </div>
             </div>
